@@ -2,32 +2,28 @@ const express = require("express");
 
 const app = express();
 
-//request handler..showing res on browser...
+const { adminAuth, userAuth } = require("./middleWares/auth");
 
-//this get will handle get api call
-app.get("/user", (req, res) => {
-  res.send({ firstName: "Vinod", lastName: "Patil" });
+app.use("/admin", adminAuth);
+
+app.use("/user", userAuth);
+
+app.use("/user/getUserData", (err, req, res) => {
+  try {
+    throw new Error("jsdhjgdf");
+    res.send("User data received...");
+  } catch (err) {
+    console.log("Something went wrong...");
+  }
 });
 
-app.post("/user", (req, res) => {
-  res.send("Data inserted successfully...!!!");
+app.get("/admin/getAllData", (req, res) => {
+  res.send("All data sent...");
 });
 
-app.delete("/user", (req, res) => {
-  res.send("Record deleted successfully...!!!");
+app.get("/admin/deleteUser", (req, res) => {
+  res.send("Deleted a user...");
 });
-
-app.use("/about", (req, res) => {
-  res.send("Its an about page...");
-});
-
-app.use("/test", (req, res) => {
-  res.send("Hello from the server");
-});
-
-// app.use("/", (req, res) => {
-//   res.send("Namaste node...");
-// });
 
 app.listen(3000, () => {
   console.log("Server is successfully listening on port number 3000...!!");
