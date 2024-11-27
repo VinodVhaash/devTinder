@@ -12,7 +12,7 @@ app.post("/signup", async (req, res) => {
     await user.save();
     res.send("User added successfully...");
   } catch (err) {
-    res.send("Error while adding User...");
+    res.status(400).send("Error while adding User..." + err.message);
   }
 });
 
@@ -76,16 +76,35 @@ app.delete("/deleteUser", async (req, res) => {
 });
 
 //update a data...
-app.patch("/user", async (req, res) => {
-  const userId = req.body.userId;
+app.patch("/user/:userId", async (req, res) => {
+  const userId = req.params?.userId;
 
   const data = req.body;
 
+  // Validation: Prevent updating the 'email' field
+  // if (req.body.emailId) {
+  //   return res.status(400).json({ message: "Updating email is not allowed" });
+  // }
+
   try {
+    const ALLOWED_UPDATES = ["skills", "age", "gender", "about"];
+
+    const isUpdateAllowed = Object.keys(data).every((k) =>
+      ALLOWED_UPDATES.includes(k)
+    );
+
+    if (!isUpdateAllowed) {
+      res.status(400).send("Update is not allowed...");
+    }
+
+    if (data.skills.length > 10) {
+      throw new error("Skills cannot be more than 10.");
+    }
+
     const user = await User.findByIdAndUpdate({ _id: userId }, data);
     res.send("data updated successfully...");
   } catch (err) {
-    res.status(400).send("Something went wrong...");
+    res.status(400).send("Something went wrong..." + err.message);
   }
 });
 
